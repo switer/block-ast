@@ -1,0 +1,28 @@
+{
+  "name": "block-nested",
+  "version": "1.1.0",
+  "description": "Template block nested syntax parser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/switer/block-nested.git"
+  },
+  "keywords": [
+    "template",
+    "block",
+    "nested",
+    "parser"
+  ],
+  "author": "switer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/switer/block-nested/issues"
+  },
+  "homepage": "https://github.com/switer/block-nested",
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  }
+}
