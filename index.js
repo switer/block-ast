@@ -1,9 +1,9 @@
 'use strict';
 
-var NODE_FRAGMENT = 1
-var NODE_SELF_CLOSE = 2
-var NODE_TEXT = 3
-var NODE_BLOCK = 4
+var NODE_FRAGMENT = 'FRAGMENT'
+var NODE_SELF_CLOSE = 'SELFT_CLOSE'
+var NODE_TEXT = 'TEXT'
+var NODE_BLOCK = 'BLOCK'
 
 /**
  * Get top item of the stack
@@ -48,7 +48,7 @@ nproto.appendChild = function (n) {
  * @param  {Function}  handler   Block content handler
  * @return {string}              Parsed content
  */
-module.exports = function (operator, isSelfCloseTag, isOpen, handler) {
+module.exports = function (operator, isSelfCloseTag, isOpen) {
 	function _opertor () {
 		return typeof operator == 'function' 
 			? operator() 
@@ -64,57 +64,30 @@ module.exports = function (operator, isSelfCloseTag, isOpen, handler) {
 		var root = new Node(NODE_FRAGMENT)
 		var pointer = root
 		var n
+
 		function process(c) {
-			console.log(c)
+			if (!c) return
 			if (_isOperator(c)) {
 				if (isSelfCloseTag(c)) {
 					// self-close tag
-					c = handler({
-						type: 'close',
-						tag: c
-					})
 					n = new Node(NODE_SELF_CLOSE, c)
 					pointer.appendChild(n)
 				} else if (isOpen(c)) {
 					// block tag open
-					stack.push(c)
-					n = new Node(NODE_BLOCK)
+					n = new Node(NODE_BLOCK, [c, null])
 					pointer.appendChild(n)
 					// deep into
 					pointer = n
-					return
 				} else {
-					// block tag close
-					// pop conent
-					var v = stack.pop()
-					// pop open tag
-					var o = stack.pop()
-					// only open tag push to stack
-					if (!_isOperator(o)) {
-						throw new Error('Unmatch token "' + c + '"')
-					}
-					// handler content
-					c = handler({
-						type: 'block',
-						open: o,
-						content: v, 
-						close: c
-					})
-					pointer.nodeValue = c
+					pointer.nodeValue[1] = c
 					// exit
 					pointer = pointer.parentNode
 				}
+			} else {
+				pointer.appendChild(new Node(NODE_TEXT, c))
 			}
-			var topItem = _stackTop(stack)
-			if ( !_isOperator(topItem) || !isOpen(topItem)) {
-				// merge result
-				c = (stack.pop() || '') + '' + c
-			}
-			stack.push(c)
-			pointer.appendChild(new Node(NODE_TEXT, c))
 		}
 		tokens.forEach(process)
-		// return stack.join('')
 		return root
 	}
 }
