@@ -74,12 +74,11 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 					pointer.appendChild(n)
 				} else if (isOpen(c)) {
 					// block tag open
-					n = new Node(NODE_BLOCK, [c, null])
+					n = new Node(NODE_BLOCK, c)
 					pointer.appendChild(n)
 					// deep into
 					pointer = n
 				} else {
-					pointer.nodeValue[1] = c
 					// exit
 					pointer = pointer.parentNode
 				}
