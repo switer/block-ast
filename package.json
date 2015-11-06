@@ -1,27 +1,27 @@
 {
-  "name": "block-nested",
+  "name": "block-ast",
   "version": "1.0.0",
-  "description": "Template block nested syntax parser.",
+  "description": "Custom template syntax and pase to ast.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/index.js"
+    "test": "mocha test/ast.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/switer/block-nested.git"
+    "url": "https://github.com/switer/block-ast.git"
   },
   "keywords": [
     "template",
     "block",
-    "nested",
+    "ast",
     "parser"
   ],
   "author": "switer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/switer/block-nested/issues"
+    "url": "https://github.com/switer/block-ast/issues"
   },
-  "homepage": "https://github.com/switer/block-nested",
+  "homepage": "https://github.com/switer/block-ast",
   "devDependencies": {
     "mocha": "^2.2.5"
   }

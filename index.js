@@ -33,6 +33,7 @@ function Node (t, v) {
 	this.nodeValue = v || null
 	this.childNodes = []
 	this.parentNode = null
+	this.closeTag = null
 }
 var nproto = Node.prototype
 nproto.appendChild = function (n) {
@@ -79,7 +80,8 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 					// deep into
 					pointer = n
 				} else {
-					// exit
+					pointer.closeTag = c
+					// exit, close tag
 					pointer = pointer.parentNode
 				}
 			} else {

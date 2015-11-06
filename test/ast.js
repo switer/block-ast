@@ -1,5 +1,5 @@
 'use strict';
-
+var assert = require("assert")
 var fs = require('fs')
 var SELF_CLOSE_REG = /\{%[\s\S]+?\/%\}/
 var CLOSE_REG = /\{%\/[\s\S]+?%\}/
@@ -20,7 +20,8 @@ var parser = require('../index')(
 	}
 )
 
-var ast = parser(fs.readFileSync(__dirname + '/c.tpl', 'utf-8'))
+var tpl = fs.readFileSync(__dirname + '/c.tpl', 'utf-8')
+var ast = parser(tpl)
 
 var NODE_FRAGMENT = 'FRAGMENT'
 var NODE_SCS = 'SCS'
@@ -36,11 +37,11 @@ function walk(node, scope) {
 			}).join('')
 			break
 		case 'BLOCK':
-			html += node.nodeValue[0]
+			html += node.nodeValue
 			html += node.childNodes.map(function (n) {
 				return walk(n)
 			}).join('')
-			html += node.nodeValue[1]
+			html += node.closeTag
 			break
 		case 'SCS':
 			html += node.nodeValue
@@ -51,3 +52,10 @@ function walk(node, scope) {
 	}
 	return html
 }
+describe('AST Parser', function () {
+	it('Walk then render', function () {
+		var html = walk(ast)
+		assert.equal(html, tpl)
+	})
+})
+
