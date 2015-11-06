@@ -37,11 +37,11 @@ function walk(node, scope) {
 			}).join('')
 			break
 		case 'BLOCK':
-			html += node.nodeValue
+			html += node.open
 			html += node.childNodes.map(function (n) {
 				return walk(n)
 			}).join('')
-			html += node.closeTag
+			html += node.close
 			break
 		case 'SCS':
 			html += node.nodeValue
