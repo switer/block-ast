@@ -1,7 +1,7 @@
 'use strict';
 
 var NODE_FRAGMENT = 'FRAGMENT'
-var NODE_SELF_CLOSE = 'SELFT_CLOSE'
+var NODE_SCS = 'SCS'
 var NODE_TEXT = 'TEXT'
 var NODE_BLOCK = 'BLOCK'
 
@@ -70,7 +70,7 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 			if (_isOperator(c)) {
 				if (isSelfCloseTag(c)) {
 					// self-close tag
-					n = new Node(NODE_SELF_CLOSE, c)
+					n = new Node(NODE_SCS, c)
 					pointer.appendChild(n)
 				} else if (isOpen(c)) {
 					// block tag open

@@ -1,5 +1,6 @@
 'use strict';
 
+var fs = require('fs')
 var SELF_CLOSE_REG = /\{%[\s\S]+?\/%\}/
 var CLOSE_REG = /\{%\/[\s\S]+?%\}/
 
@@ -16,22 +17,17 @@ var parser = require('../index')(
 	// this judge condition is base on the condition of operator match
 	function isOpenTag (c) {
 		return !CLOSE_REG.test(c)
-	},
-	function handler(ast) {
-		return ast
 	}
 )
 
-var ast = parser('{% a %}{% b /%}{%/ a %}abc{%c/%}{%c/%}{%c/%}')
-
+var ast = parser(fs.readFileSync(__dirname + '/c.tpl', 'utf-8'))
 
 var NODE_FRAGMENT = 'FRAGMENT'
-var NODE_SELF_CLOSE = 'SELFT_CLOSE'
+var NODE_SCS = 'SCS'
 var NODE_TEXT = 'TEXT'
 var NODE_BLOCK = 'BLOCK'
 
-
-function walk(node) {
+function walk(node, scope) {
 	var html = ''
 	switch (node.nodeType) {
 		case 'FRAGMENT':
@@ -46,7 +42,7 @@ function walk(node) {
 			}).join('')
 			html += node.nodeValue[1]
 			break
-		case 'SELFT_CLOSE':
+		case 'SCS':
 			html += node.nodeValue
 			break
 		case 'TEXT':
@@ -55,5 +51,3 @@ function walk(node) {
 	}
 	return html
 }
-
-console.log(walk(ast))
