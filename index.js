@@ -1,17 +1,10 @@
 'use strict';
 
-var NODE_FRAGMENT = 'FRAGMENT'
-var NODE_SCS = 'SCS'
-var NODE_TEXT = 'TEXT'
-var NODE_BLOCK = 'BLOCK'
-
-/**
- * Get top item of the stack
- * @param  {Array} stack  stack
- */
-function _stackTop (stack) {
-	return stack[stack.length - 1]
-}
+var NODE = 0
+var NODE_FRAGMENT = 1
+var NODE_BLOCK = 2
+var NODE_SCS = 3
+var NODE_TEXT = 4
 /**
  * join arr2's items to arr
  * @param  {Array} arr1  odd number index items
@@ -28,17 +21,57 @@ function _join(arr1, arr2) {
 	// merge remains
 	return joinedArr.concat(arr1).concat(arr2)
 }
-function Node (t, v) {
-	this.nodeType = t
-	this.nodeValue = v || null
+/**
+ * Prototype inherit
+ */
+function _inherit(Ctor, Parent) {
+	function Dummy () {}
+	Dummy.prototype = Parent.prototype
+	Ctor.prototype = new Dummy()
+	Ctor.prototype.supper = function () {
+		Parent.apply(this, arguments)
+	}
+	Ctor.prototype.constructor = Ctor
+	return Ctor
+}
+function Node() {
+	this.nodeType = NODE
+	this.nodeValue = null
 	this.childNodes = []
 	this.parentNode = null
 }
-var nproto = Node.prototype
-nproto.appendChild = function (n) {
+Node.prototype.appendChild = function (n) {
 	this.childNodes.push(n)
 	n.parentNode = this
 }
+function TextNode(t) {
+	this.supper()
+	this.nodeType = NODE_TEXT
+	this.nodeValue = t
+}
+function SCSNode(o) {
+	this.supper()
+	this.nodeType = NODE_SCS
+	this.outerHTML = o
+}
+function FragmentNode() {
+	this.supper()
+	this.nodeType = NODE_FRAGMENT
+}
+function BlockNode(o) {
+	this.supper()
+	this.nodeType = NODE_BLOCK
+	this.openHTML = o
+	this.closeHTML = ''
+}
+/**
+ * All Nodes are inherit Node 
+ */
+_inherit(TextNode, Node)
+_inherit(SCSNode, Node)
+_inherit(FragmentNode, Node)
+_inherit(BlockNode, Node)
+
 
 /**
  * handle block template syntax
@@ -60,32 +93,30 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 	return function (text) {
 		var opr = _opertor()
 		var tokens = _join(text.split(opr), text.match(opr))
-		var stack = []
-		var root = new Node(NODE_FRAGMENT)
+		var root = new FragmentNode()
 		var pointer = root
 		var n
 
 		function process(c) {
 			if (!c) return
 			if (_isOperator(c)) {
-				if (isSelfCloseTag(c)) {
+				if (isSelfCloseTag(c, pointer)) {
 					// self-close tag
-					n = new Node(NODE_SCS, c)
+					n = new SCSNode(c)
 					pointer.appendChild(n)
-				} else if (isOpen(c)) {
+				} else if (isOpen(c, pointer)) {
 					// block tag open
-					n = new Node(NODE_BLOCK, '')
-					n.open = c
+					n = new BlockNode(c)
 					pointer.appendChild(n)
 					// deep into
 					pointer = n
 				} else {
-					pointer.close = c
-					// exit, close tag
+					// exit, tag close
+					pointer.closeHTML = c
 					pointer = pointer.parentNode
 				}
 			} else {
-				pointer.appendChild(new Node(NODE_TEXT, c))
+				pointer.appendChild(new TextNode(c))
 			}
 		}
 		tokens.forEach(process)

@@ -23,30 +23,25 @@ var parser = require('../index')(
 var tpl = fs.readFileSync(__dirname + '/c.tpl', 'utf-8')
 var ast = parser(tpl)
 
-var NODE_FRAGMENT = 'FRAGMENT'
-var NODE_SCS = 'SCS'
-var NODE_TEXT = 'TEXT'
-var NODE_BLOCK = 'BLOCK'
-
 function walk(node, scope) {
 	var html = ''
 	switch (node.nodeType) {
-		case 'FRAGMENT':
+		case 1:
 			html += node.childNodes.map(function (n) {
 				return walk(n)
 			}).join('')
 			break
-		case 'BLOCK':
-			html += node.open
+		case 2:
+			html += node.openHTML
 			html += node.childNodes.map(function (n) {
 				return walk(n)
 			}).join('')
-			html += node.close
+			html += node.closeHTML
 			break
-		case 'SCS':
-			html += node.nodeValue
+		case 3:
+			html += node.outerHTML
 			break
-		case 'TEXT':
+		case 4:
 			html += node.nodeValue
 			break
 	}
