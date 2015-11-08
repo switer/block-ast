@@ -92,7 +92,7 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 	}
 	return function (text) {
 		var opr = _opertor()
-		var tokens = _join(text.split(opr), text.match(opr))
+		var tokens = _join(text.split(opr), text.match(opr) || [])
 		var root = new FragmentNode()
 		var pointer = root
 		var n

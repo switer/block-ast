@@ -20,8 +20,6 @@ var parser = require('../index')(
 	}
 )
 
-var tpl = fs.readFileSync(__dirname + '/c.tpl', 'utf-8')
-var ast = parser(tpl)
 
 function walk(node, scope) {
 	var html = ''
@@ -49,6 +47,14 @@ function walk(node, scope) {
 }
 describe('AST Parser', function () {
 	it('Walk then render', function () {
+		var tpl = fs.readFileSync(__dirname + '/c.tpl', 'utf-8')
+		var ast = parser(tpl)
+		var html = walk(ast)
+		assert.equal(html, tpl)
+	})
+	it('Render without any tag', function () {
+		var tpl = '<div></div>'
+		var ast = parser(tpl)
 		var html = walk(ast)
 		assert.equal(html, tpl)
 	})
