@@ -34,7 +34,9 @@ function _inherit(Ctor, Parent) {
 	Ctor.prototype.constructor = Ctor
 	return Ctor
 }
+var _id = 1
 function Node() {
+	this.id = _id ++
 	this.nodeType = NODE
 	this.nodeValue = null
 	this.childNodes = []
@@ -81,7 +83,8 @@ _inherit(BlockNode, Node)
  * @param  {Function}  handler   Block content handler
  * @return {string}              Parsed content
  */
-module.exports = function (operator, isSelfCloseTag, isOpen) {
+module.exports = function (operator, isSelfCloseTag, isOpen, options) {
+	options = options || {}
 	function _opertor () {
 		return typeof operator == 'function' 
 			? operator() 
@@ -95,9 +98,10 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 		var tokens = _join(text.split(opr), text.match(opr) || [])
 		var root = new FragmentNode()
 		var pointer = root
+		var unclose = {}
 		var n
 
-		function process(c) {
+		function process(c, i) {
 			if (!c) return
 			if (_isOperator(c)) {
 				if (isSelfCloseTag(c, pointer)) {
@@ -110,9 +114,12 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 					pointer.appendChild(n)
 					// deep into
 					pointer = n
+					pointer._index = i
+					unclose[n.id] = pointer
 				} else {
 					// exit, tag close
 					pointer.closeHTML = c
+					delete unclose[pointer.id]
 					pointer = pointer.parentNode
 				}
 			} else {
@@ -120,6 +127,19 @@ module.exports = function (operator, isSelfCloseTag, isOpen) {
 			}
 		}
 		tokens.forEach(process)
+		for (var k in unclose) {
+			if (unclose.hasOwnProperty(k) && unclose[k]) {
+				var tag = unclose[k]
+				var line = tokens.slice(0, tag._index).join('').split(/\r?\n/).length
+				var msg = '"' + tag.openHTML + '" is not closing. Line:' + line
+				if (options.strict) {
+					throw new Error(msg)
+				} else {
+					console.log('[WARNING] ' + msg)
+				}
+				break
+			}
+		}
 		return root
 	}
 }

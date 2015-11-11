@@ -17,6 +17,9 @@ var parser = require('../index')(
 	// this judge condition is base on the condition of operator match
 	function isOpenTag (c) {
 		return !CLOSE_REG.test(c)
+	},
+	{
+		strict: true
 	}
 )
 
@@ -57,6 +60,16 @@ describe('AST Parser', function () {
 		var ast = parser(tpl)
 		var html = walk(ast)
 		assert.equal(html, tpl)
+	})
+	it('Unclosing tag will throw error', function () {
+		var tpl = '<div>\n{%component/%}</div> \n{%component%}'
+		try {
+			var ast = parser(tpl)
+		} catch (e) {
+			assert(/Line:3$/im.test(e.message))
+			return assert(true)
+		}
+		assert(false)
 	})
 })
 
