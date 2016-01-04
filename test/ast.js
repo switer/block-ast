@@ -70,6 +70,11 @@ describe('AST Parser', function () {
 			return assert(true)
 		}
 		assert(false)
+	}),
+	it('toString', function() {
+		var tpl = '<div>{%component/%}</div><div>{%component%}{%component/%}{%/component%}</div>'
+		var ast = parser(tpl)
+		assert.equal(ast.toString(), tpl)
 	})
 })
 

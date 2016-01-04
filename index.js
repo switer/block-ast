@@ -50,21 +50,41 @@ function TextNode(t) {
 	this.supper()
 	this.nodeType = NODE_TEXT
 	this.nodeValue = t
+	this.toString = TextNode2String
 }
 function SCSNode(o) {
 	this.supper()
 	this.nodeType = NODE_SCS
 	this.outerHTML = o
+	this.toString = SCSNode2String
 }
 function FragmentNode() {
 	this.supper()
 	this.nodeType = NODE_FRAGMENT
+	this.toString = FragmentNode2String
 }
 function BlockNode(o) {
 	this.supper()
 	this.nodeType = NODE_BLOCK
 	this.openHTML = o
 	this.closeHTML = ''
+	this.toString = BlockNode2String
+}
+function TextNode2String() {
+	return this.nodeValue
+}
+function SCSNode2String() {
+	return this.outerHTML
+}
+function FragmentNode2String() {
+	return this.childNodes.map(function (node) {
+		return node.toString()
+	}).join('')
+}
+function BlockNode2String() {
+	return this.openHTML + this.childNodes.map(function (node) {
+		return node.toString()
+	}).join('') + this.closeHTML
 }
 /**
  * All Nodes are inherit Node 

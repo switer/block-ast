@@ -1,6 +1,6 @@
 {
   "name": "block-ast",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Custom template syntax and pase to ast.",
   "main": "index.js",
   "scripts": {
